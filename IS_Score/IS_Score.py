@@ -180,10 +180,10 @@ def getIS_Score(raw_sp: np.array, baseline_corrected_sp: np.array, sp_axis: np.a
                           color="lightblue", alpha=0.4)
 
         for i, (left_edge, right_edge) in enumerate(peak_edges):
-            index_overfitting = DebugCollector.collected_data["REGION_PEAK_PENALIZATION"]["overfitting_index_plot"][i]
+            index_overfitting = DebugCollector.collected_data["REGION_PEAK_PENALIZATION"]["overfitting_index"][i]
             overfitting = DebugCollector.collected_data["REGION_PEAK_PENALIZATION"]["overfitting"][i]
 
-            index_underfitting = DebugCollector.collected_data["REGION_PEAK_PENALIZATION"]["underfitting_index_plot"][i]
+            index_underfitting = DebugCollector.collected_data["REGION_PEAK_PENALIZATION"]["underfitting_index"][i]
             underfitting = DebugCollector.collected_data["REGION_PEAK_PENALIZATION"]["underfitting"][i]
             if len(overfitting) > 0:
                 ax.vlines(x=sp_axis[left_edge:right_edge][index_overfitting],

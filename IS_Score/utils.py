@@ -3,7 +3,19 @@ import numpy as np
 
 class DebugCollector:
     """
-    Utility class used to obtain the information of the algorithms.
+    Utility class for collecting debugging information during algorithm execution.
+
+    This class allows logging and retrieving arbitrary debug information grouped by categories and subkeys.
+    It supports separate storage for general data and plot-specific data. Logging can be enabled or disabled globally.
+
+    Attributes
+    ----------
+    enabled : bool
+        Indicates whether data collection is active.
+    collected_data : dict
+        Dictionary to store general debug data in the form {category: {subkey: value}}.
+    plot_data : dict
+        Dictionary to store plot-related debug data in the same format.
     """
     enabled = False
     collected_data = {}
@@ -11,18 +23,35 @@ class DebugCollector:
 
     @classmethod
     def activate(cls):
+        """
+        Enable the debug collector and reset previously collected data.
+        """
         cls.enabled = True
         cls.collected_data = {}
+        cls.plot_data = {}
 
     @classmethod
     def deactivate(cls):
+        """
+        Disable the debug collector and clear previously collected data.
+        """
         cls.enabled = False
         cls.collected_data = {}
+        cls.plot_data = {}
 
     @classmethod
     def log(cls, category, subkey, value):
         """
-        Store value in collected_data[category][subkey] = value
+        Log a value into the general debug data under the specified category and subkey.
+
+        Parameters
+        ----------
+        category : str
+            The top-level key under which the data will be stored.
+        subkey : str
+            The secondary key under the category.
+        value : Any
+            The value to store.
         """
         if cls.enabled:
             if category not in cls.collected_data:
@@ -32,7 +61,16 @@ class DebugCollector:
     @classmethod
     def logPlot(cls, category, subkey, value):
         """
-        Store value in collected_data[category][subkey] = value
+        Log a value into the plot-specific debug data under the specified category and subkey.
+
+        Parameters
+        ----------
+        category : str
+            The top-level key under which the plot data will be stored.
+        subkey : str
+            The secondary key under the category.
+        value : Any
+            The value to store.
         """
         if cls.enabled:
             if category not in cls.plot_data:
@@ -41,6 +79,21 @@ class DebugCollector:
 
     @classmethod
     def get(cls, category, subkey=None):
+        """
+        Retrieve a value or sub-dictionary from the general debug data.
+
+        Parameters
+        ----------
+        category : str
+            The category to retrieve.
+        subkey : str, optional
+            If provided, returns the specific value under the subkey.
+
+        Returns
+        -------
+        Any or dict or None
+            The requested value, dictionary of subkeys, or None if not found.
+        """
         if category not in cls.collected_data:
             return None
         if subkey:
@@ -49,6 +102,21 @@ class DebugCollector:
 
     @classmethod
     def getPlot(cls, category, subkey=None):
+        """
+        Retrieve a value or sub-dictionary from the plot debug data.
+
+        Parameters
+        ----------
+        category : str
+            The category to retrieve.
+        subkey : str, optional
+            If provided, returns the specific value under the subkey.
+
+        Returns
+        -------
+        Any or dict or None
+            The requested value, dictionary of subkeys, or None if not found.
+        """
         if category not in cls.plot_data:
             return None
         if subkey:
@@ -57,10 +125,26 @@ class DebugCollector:
 
     @classmethod
     def all(cls):
+        """
+        Return the full dictionary of collected general debug data.
+
+        Returns
+        -------
+        dict
+            The collected general debug data.
+        """
         return cls.collected_data
 
     @classmethod
     def allPlot(cls):
+        """
+        Return the full dictionary of collected plot debug data.
+
+        Returns
+        -------
+        dict
+            The collected plot debug data.
+        """
         return cls.plot_data
 
 def normalizeSpectraBaseline(raw_sp: np.array, baseline: np.array) -> tuple:
