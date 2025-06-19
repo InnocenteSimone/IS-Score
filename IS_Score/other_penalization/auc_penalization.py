@@ -1,6 +1,7 @@
 import numpy as np
 from copy import copy
 from scipy import signal, interpolate
+from IS_Score.utils import DebugCollector
 
 
 def linearInterpOverRegion(sp: np.array, peak_edges: list):
@@ -154,13 +155,18 @@ def getAUCPenalty(sp: np.array, baseline: np.array, peaks: list, peak_edges: lis
 
     negative_area_diff = abs(np.trapz(interp_baseline_diff[interp_baseline_diff < 0]))
     positive_area_diff = np.trapz(interp_baseline_diff[interp_baseline_diff > 0])
-    if (diff_area < 0) or (negative_area_diff / positive_area_diff > 0.7): # Overfitting
+    if (diff_area < 0) or (negative_area_diff / positive_area_diff > 0.5): # Overfitting
         auc_penalty = negative_area_diff / sp_abs_corrected_area
     else:
         auc_penalty = positive_area_diff / sp_area
 
     auc_penalization = temporary_penalization + auc_penalty
     auc_penalization = 0 if auc_penalization < 0.1 else np.round(auc_penalization, decimals=2)
+
+    if DebugCollector.enabled:
+        DebugCollector.log("AUC_PENALIZATION", "interpolation", interpolation)
+        DebugCollector.log("AUC_PENALIZATION", "auc_penalization", auc_penalization)
+
 
     return auc_penalization
 

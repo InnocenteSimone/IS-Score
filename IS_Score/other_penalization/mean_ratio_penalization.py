@@ -1,6 +1,6 @@
 import numpy as np
 from scipy import signal
-from IS_Score.utils import normalizeSpectraBaseline
+from IS_Score.utils import normalizeSpectraBaseline, DebugCollector
 
 def getMeanDipsRatioPenalization(sp: np.array, baseline: np.array):
     """
@@ -41,6 +41,12 @@ def getMeanDipsRatioPenalization(sp: np.array, baseline: np.array):
         if len(diffs) > 0:
             diffGreaterDips.append(np.mean(diffs))
 
+    if DebugCollector.enabled:
+        DebugCollector.log("MEAN_RATIO_PENALIZATION", "mean_ratio_penalty", 0)
+
     if np.mean(ratioList) < 5:
+        if DebugCollector.enabled:
+            DebugCollector.log("MEAN_RATIO_PENALIZATION", "mean_ratio_penalty", np.sum(diffGreaterDips))
+
         return np.sum(diffGreaterDips)
     return 0

@@ -1,5 +1,68 @@
 import numpy as np
 
+
+class DebugCollector:
+    """
+    Utility class used to obtain the information of the algorithms.
+    """
+    enabled = False
+    collected_data = {}
+    plot_data = {}
+
+    @classmethod
+    def activate(cls):
+        cls.enabled = True
+        cls.collected_data = {}
+
+    @classmethod
+    def deactivate(cls):
+        cls.enabled = False
+        cls.collected_data = {}
+
+    @classmethod
+    def log(cls, category, subkey, value):
+        """
+        Store value in collected_data[category][subkey] = value
+        """
+        if cls.enabled:
+            if category not in cls.collected_data:
+                cls.collected_data[category] = {}
+            cls.collected_data[category][subkey] = value
+
+    @classmethod
+    def logPlot(cls, category, subkey, value):
+        """
+        Store value in collected_data[category][subkey] = value
+        """
+        if cls.enabled:
+            if category not in cls.plot_data:
+                cls.plot_data[category] = {}
+            cls.plot_data[category][subkey] = value
+
+    @classmethod
+    def get(cls, category, subkey=None):
+        if category not in cls.collected_data:
+            return None
+        if subkey:
+            return cls.collected_data[category].get(subkey)
+        return cls.collected_data[category]
+
+    @classmethod
+    def getPlot(cls, category, subkey=None):
+        if category not in cls.plot_data:
+            return None
+        if subkey:
+            return cls.plot_data[category].get(subkey)
+        return cls.plot_data[category]
+
+    @classmethod
+    def all(cls):
+        return cls.collected_data
+
+    @classmethod
+    def allPlot(cls):
+        return cls.plot_data
+
 def normalizeSpectraBaseline(raw_sp: np.array, baseline: np.array) -> tuple:
     """
     Normalize the spectra and baseline in the range 0-1.
