@@ -1,4 +1,5 @@
 import numpy as np
+from IS_Score.utils import DebugCollector
 
 def getFakeProminences(type: str, sp: np.array, baseline: np.array, bands: list, edges: list, prominences: list):
     """
@@ -78,9 +79,21 @@ def getRegionPeakPenalty(sp: np.array, baseline: np.array, peaks: list, edges: l
     overfitting_penalties = []
 
     fake_prominences = getFakeProminences("peak", sp, baseline, peaks, edges, prominences)
+
+    if DebugCollector.enabled:
+        DebugCollector.log("REGION_PEAK_PENALIZATION", "overfitting", [])
+        DebugCollector.log("REGION_PEAK_PENALIZATION", "overfitting_index", [])
+        DebugCollector.log("REGION_PEAK_PENALIZATION", "overfitting_index_plot", [])
+        DebugCollector.log("REGION_PEAK_PENALIZATION", "underfitting", [])
+        DebugCollector.log("REGION_PEAK_PENALIZATION", "underfitting_index", [])
+        DebugCollector.log("REGION_PEAK_PENALIZATION", "underfitting_index_plot", [])
+        DebugCollector.log("REGION_PEAK_PENALIZATION", "frequencies_prominence", fake_prominences)
+
     for peak, prom, (left_edge, right_edge), fp_band in zip(peaks, prominences, edges, fake_prominences):
         freq_prom_baseline_distance_over = []
         freq_prom_baseline_distance_under = []
+
+        overfitting_indexes_plot, underfitting_indexes_plot = [], []
 
         for i, fp in enumerate(fp_band):
             baseline_intensity = baseline[left_edge:right_edge][i]
@@ -89,9 +102,11 @@ def getRegionPeakPenalty(sp: np.array, baseline: np.array, peaks: list, edges: l
             # The penalty is computed by checking if the fake prominence is above or below the baseline
             if (spectra_intensity - fp) < baseline_intensity:
                 freq_prom_baseline_distance_over.append(np.abs((spectra_intensity - fp) - baseline_intensity))
+                overfitting_indexes_plot.append(i)
 
             if (spectra_intensity - fp) > baseline_intensity:
                 freq_prom_baseline_distance_under.append(np.abs((spectra_intensity - fp) - baseline_intensity))
+                underfitting_indexes_plot.append(i)
 
         # We defined an algorithm that finds many more peaks than before, we need to reduce this penalization
         # I exploit the percentile of the fake prominence distance to the baseline
@@ -105,12 +120,28 @@ def getRegionPeakPenalty(sp: np.array, baseline: np.array, peaks: list, edges: l
             # Round in order to set to zero elements too low
             mean_over = np.round(np.mean(tmp[tmp < perc_over]), decimals=3)
             overfitting_penalties.append(mean_over)
+        else:
+            overfitting_penalties.append(0)
 
         if len(tmp2[tmp2 < perc_under]) > 0:
             mean_under = np.round(np.mean(tmp2[tmp2 < perc_under]), 4)
             underfitting_penalties.append(mean_under)
+        else:
+            underfitting_penalties.append(0)
+
+        if DebugCollector.enabled:
+            DebugCollector.get("REGION_PEAK_PENALIZATION", "overfitting").append(freq_prom_baseline_distance_over)
+            DebugCollector.get("REGION_PEAK_PENALIZATION", "overfitting_penalties").append(overfitting_penalties)
+            DebugCollector.get("REGION_PEAK_PENALIZATION", "overfitting_index").append(overfitting_indexes_plot)
+            DebugCollector.get("REGION_PEAK_PENALIZATION", "underfitting").append(freq_prom_baseline_distance_under)
+            DebugCollector.get("REGION_PEAK_PENALIZATION", "underfitting_penalties").append(underfitting_penalties)
+            DebugCollector.get("REGION_PEAK_PENALIZATION", "underfitting_index").append(underfitting_indexes_plot)
 
     regionPenalization = np.sum(overfitting_penalties) + np.sum(underfitting_penalties)
+
+    if DebugCollector.enabled:
+        DebugCollector.log("REGION_PEAK_PENALIZATION", "peak_region_penalization", regionPenalization)
+
     return regionPenalization
 
 
@@ -141,6 +172,11 @@ def getRegionDipPenalty(sp: np.array, baseline: np.array, dips: list, edges: lis
 
     fake_prominences = getFakeProminences("dip", sp, baseline, dips, edges, prominences)
 
+    if DebugCollector.enabled:
+        DebugCollector.log("REGION_DIP_PENALIZATION", "overfitting", [])
+        DebugCollector.log("REGION_DIP_PENALIZATION", "underfitting", [])
+        DebugCollector.log("REGION_DIP_PENALIZATION", "frequencies_prominence", fake_prominences)
+
     for dip, prom, (left_edge, right_edge), fp_band in zip(dips, prominences, edges, fake_prominences):
         freq_prom_baseline_distance_lower = []
         freq_prom_baseline_distance_greater = []
@@ -159,11 +195,18 @@ def getRegionDipPenalty(sp: np.array, baseline: np.array, dips: list, edges: lis
                 penalty_greater = np.abs((spectra_intensity + fp) - baseline_intensity)
             freq_prom_baseline_distance_greater.append(penalty_greater)
 
-        lower_penalization = np.mean(freq_prom_baseline_distance_lower)
-        lower_penalties.append(lower_penalization)
+        lower_penalties.append(np.mean(freq_prom_baseline_distance_lower))
+        greater_penalties.append(np.mean(freq_prom_baseline_distance_greater))
 
-        greater_penalization = np.mean(freq_prom_baseline_distance_greater)
-        greater_penalties.append(greater_penalization)
+        if DebugCollector.enabled:
+            DebugCollector.get("REGION_DIP_PENALIZATION","overfitting").append(freq_prom_baseline_distance_lower)
+            DebugCollector.get("REGION_DIP_PENALIZATION","underfitting").append(freq_prom_baseline_distance_greater)
+            DebugCollector.get("REGION_DIP_PENALIZATION","indexes").append([i for i in range(len(fp_band))])
+
 
     regionPenalization = np.sum(lower_penalties) + np.sum(greater_penalties)
+
+    if DebugCollector.enabled:
+        DebugCollector.log("REGION_DIP_PENALIZATION", "dip_region_penalization", regionPenalization)
+
     return regionPenalization

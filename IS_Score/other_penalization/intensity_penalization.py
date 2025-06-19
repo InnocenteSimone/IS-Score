@@ -1,6 +1,7 @@
 import numpy as np
 from copy import copy
 from scipy import signal
+from IS_Score.utils import DebugCollector
 
 def getSignalWithoutRegion(sp, baseline, peaks_edges, dips_edges):
     """
@@ -20,7 +21,7 @@ def getSignalWithoutRegion(sp, baseline, peaks_edges, dips_edges):
 
     Returns
     -------
-    sp_new
+    sp_new: np.array
         The new signal.
     """
 
@@ -49,7 +50,7 @@ def addNoiseToSignal(sp, scale, peak_edges, dip_edges):
 
     Returns
     -------
-    sp_new
+    sp_new: np.array
         The new signal.
     """
     sp_new = copy(sp)
@@ -76,7 +77,7 @@ def getIntensityPenalization(sp: np.array, baseline: np.array, peaks_edges: list
 
     Returns
     -------
-    intensity_penalization
+    intensity_penalization: float
         The value of the penalization.
     """
 
@@ -100,6 +101,10 @@ def getIntensityPenalization(sp: np.array, baseline: np.array, peaks_edges: list
     filtered_indexes = greater_indexes[intensity_diff > threshold]
 
     intensity_penalization = len(filtered_indexes) / (len(sp) - len(filtered_indexes))
+
+    if DebugCollector.enabled:
+        DebugCollector.log("INTENSITY_PENALIZATION", "filtered_indexes", filtered_indexes)
+        DebugCollector.log("INTENSITY_PENALIZATION", "intensity_penalization", intensity_penalization)
 
     return intensity_penalization
 
