@@ -106,7 +106,7 @@ def getSingleDipPenalty(sp: np.array, baseline: np.array, dips: list, prominence
         DebugCollector.log("SINGLE_DIP_PENALIZATION", "lower_point_for_penalization", lower_point_for_penalization)
         DebugCollector.log("SINGLE_DIP_PENALIZATION", "single_dip_penalization", 0)
 
-    if len(dips) == 0 or dips_to_penalize == 0:
+    if len(dips) == 0 or len(dips_to_penalize) == 0:
         return 0
 
     ratio = len(dips_to_penalize) / len(dips)

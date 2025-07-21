@@ -33,6 +33,8 @@ def getIS_Score(raw_sp: np.array, baseline_corrected_sp: np.array, sp_axis: np.a
         return -1
 
     PEAKS_DIPS_TOL = kwargs.pop("peaks_dips_tolerance", {"peaks": 5, "dips": 5})
+    custom_peaks = kwargs.get("custom_peaks", None)
+    custom_dips = kwargs.get("custom_dips", None)
 
 
     raw_sp, baseline_corrected_sp, sp_axis = np.array(raw_sp), np.array(baseline_corrected_sp), np.array(sp_axis)
@@ -45,7 +47,10 @@ def getIS_Score(raw_sp: np.array, baseline_corrected_sp: np.array, sp_axis: np.a
     raw_sp_norm_bas, baseline_sp_norm = normalizeSpectraBaseline(raw_sp, baseline)
     combined_min, combined_max = min(np.min(raw_sp_norm_bas), np.min(baseline_sp_norm)), max(np.max(raw_sp_norm_bas), np.max(baseline_sp_norm))
 
-    peaks = findBands(raw_sp_norm, tolerance=PEAKS_DIPS_TOL["peaks"])
+    if custom_peaks is not None:
+        peaks = custom_peaks
+    else:
+        peaks = findBands(raw_sp_norm, tolerance=PEAKS_DIPS_TOL["peaks"])
     peak_edges = getBandEdges(raw_sp_norm, peaks)
 
     # Sanity Check for bands and edges
@@ -59,7 +64,10 @@ def getIS_Score(raw_sp: np.array, baseline_corrected_sp: np.array, sp_axis: np.a
     peak_region_penalization = getRegionPeakPenalty(raw_sp_norm_bas, baseline_sp_norm, peaks, peak_edges, peaks_prominences)
 
     neg_sp = (-raw_sp_norm - min(-raw_sp_norm)) / (max(-raw_sp_norm) - min(-raw_sp_norm))
-    dips = findBands(neg_sp, tolerance=PEAKS_DIPS_TOL["dips"])
+    if custom_dips is not None:
+        dips = custom_dips
+    else:
+        dips = findBands(neg_sp, tolerance=PEAKS_DIPS_TOL["dips"])
     dips_edges = getBandEdges(neg_sp, dips)
     dips, dips_edges = validateBands(dips, dips_edges)
 
@@ -78,7 +86,7 @@ def getIS_Score(raw_sp: np.array, baseline_corrected_sp: np.array, sp_axis: np.a
                           peak_region_penalization + dips_region_penalization +
                           auc_penalization + mean_ratio_penalization)
 
-    is_score = round(1 - min(final_penalization, 1), 2)
+    is_score = round(1 - min(final_penalization, 1), 4)
 
     if DebugCollector.enabled:
         DebugCollector.log("GENERAL", "sp_norm", raw_sp_norm_bas)
