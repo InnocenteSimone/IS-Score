@@ -138,14 +138,14 @@ def _boundEdgesDetection(sp: np.array, bands: list) -> list:
 
 def getBandEdges(sp: np.array, bands: list) -> list:
     """
-    Find the edges of a band list.
+    Find the edges for each band in the list.
 
     Parameters
     ----------
     sp : np.array
         The Raman spectrum.
     bands : list
-        The list containing the bands of which edges need to be detected..
+        The list containing the bands of which edges need to be detected.
 
     Returns
     -------
@@ -203,7 +203,7 @@ def getBandEdges(sp: np.array, bands: list) -> list:
     return final_edges
 
 
-def validateBands(bands: list, edges: list) -> tuple:
+def _validateBands(bands: list, edges: list) -> tuple:
     """
     Check if the bands and edges are valid.
     The edges which are closes to each other or to the band are removed.
@@ -233,6 +233,7 @@ def validateBands(bands: list, edges: list) -> tuple:
 def getWlenProminences(sp, bands, edges):
     """
     Retrieve the bands prominence using the wlen parameters.
+    The wlen parameter is set at twice the distance between the edges of the band.
 
     Parameters
     ----------

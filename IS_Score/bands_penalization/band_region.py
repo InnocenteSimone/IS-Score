@@ -1,12 +1,12 @@
 import numpy as np
 from IS_Score.utils import DebugCollector
 
-def getFakeProminences(type: str, sp: np.array, baseline: np.array, bands: list, edges: list, prominences: list):
+def getRamanShiftProminences(type: str, sp: np.array, baseline: np.array, bands: list, edges: list, prominences: list):
     """
-    Retrieve the fake prominences exploiting the baseline and the peak prominence.
-    Fake prominences are proportional value of the real peak prominence but computed on the peak region.
+    Retrieve the Raman Shift Prominences exploiting the baseline and the band prominence.
+    Raman Shift Prominences are proportional value of the real peak prominence but computed on the band region.
     The distance between the baseline and the prominence is used to compute the proportional value, exploiting the
-    difference between the baseline and each frequency in the peak region.
+    difference between the baseline and each frequency in the band region.
 
     Parameters
     ----------
@@ -14,8 +14,8 @@ def getFakeProminences(type: str, sp: np.array, baseline: np.array, bands: list,
         The spectra data.
     baseline: np.array
         The baseline data.
-    peaks: list
-        The list containing the peaks.
+    bands: list
+        The list containing the bands.
     edges: list
         The list containing the edges for each peak.
     prominences: list
@@ -23,11 +23,11 @@ def getFakeProminences(type: str, sp: np.array, baseline: np.array, bands: list,
 
     Returns
     -------
-    list
+    raman_shift_prominences: list
         The list with the fake prominences.
     """
 
-    fake_prominences = []
+    raman_shift_prominences = []
     for band, prom, (left_edge, right_edge) in zip(bands, prominences, edges):
         region_diff = np.abs(sp[left_edge:right_edge] - baseline[left_edge:right_edge])
 
@@ -47,9 +47,9 @@ def getFakeProminences(type: str, sp: np.array, baseline: np.array, bands: list,
 
             band_region_fake_prom.append(prominence_freq)
 
-        fake_prominences.append(band_region_fake_prom)
+        raman_shift_prominences.append(band_region_fake_prom)
 
-    return fake_prominences
+    return raman_shift_prominences
 
 
 
@@ -72,13 +72,13 @@ def getRegionPeakPenalty(sp: np.array, baseline: np.array, peaks: list, edges: l
 
     Returns
     -------
-    float
+    peakRegionPenalization: float
         The final penalty for each peak region.
     """
     underfitting_penalties = []
     overfitting_penalties = []
 
-    fake_prominences = getFakeProminences("peak", sp, baseline, peaks, edges, prominences)
+    raman_shift_prominences = getRamanShiftProminences("peak", sp, baseline, peaks, edges, prominences)
 
     if DebugCollector.enabled:
         DebugCollector.log("REGION_PEAK_PENALIZATION", "overfitting", [])
@@ -87,9 +87,9 @@ def getRegionPeakPenalty(sp: np.array, baseline: np.array, peaks: list, edges: l
         DebugCollector.log("REGION_PEAK_PENALIZATION", "underfitting", [])
         DebugCollector.log("REGION_PEAK_PENALIZATION", "underfitting_penalties", [])
         DebugCollector.log("REGION_PEAK_PENALIZATION", "underfitting_index", [])
-        DebugCollector.log("REGION_PEAK_PENALIZATION", "frequencies_prominence", fake_prominences)
+        DebugCollector.log("REGION_PEAK_PENALIZATION", "raman_shift_prominences", raman_shift_prominences)
 
-    for peak, prom, (left_edge, right_edge), fp_band in zip(peaks, prominences, edges, fake_prominences):
+    for peak, prom, (left_edge, right_edge), fp_band in zip(peaks, prominences, edges, raman_shift_prominences):
         freq_prom_baseline_distance_over = []
         freq_prom_baseline_distance_under = []
 
@@ -137,12 +137,12 @@ def getRegionPeakPenalty(sp: np.array, baseline: np.array, peaks: list, edges: l
             DebugCollector.get("REGION_PEAK_PENALIZATION", "underfitting_penalties").append(underfitting_penalties)
             DebugCollector.get("REGION_PEAK_PENALIZATION", "underfitting_index").append(underfitting_indexes_plot)
 
-    regionPenalization = np.sum(overfitting_penalties) + np.sum(underfitting_penalties)
+    peakRegionPenalization = np.sum(overfitting_penalties) + np.sum(underfitting_penalties)
 
     if DebugCollector.enabled:
-        DebugCollector.log("REGION_PEAK_PENALIZATION", "peak_region_penalization", regionPenalization)
+        DebugCollector.log("REGION_PEAK_PENALIZATION", "peak_region_penalization", peakRegionPenalization)
 
-    return regionPenalization
+    return peakRegionPenalization
 
 
 def getRegionDipPenalty(sp: np.array, baseline: np.array, dips: list, edges: list, prominences: list):
@@ -164,21 +164,21 @@ def getRegionDipPenalty(sp: np.array, baseline: np.array, dips: list, edges: lis
 
     Returns
     -------
-    float
+    dipRegionPenalization: float
         The final penalty for each dip region.
     """
 
     lower_penalties, greater_penalties = [], []
 
-    fake_prominences = getFakeProminences("dip", sp, baseline, dips, edges, prominences)
+    raman_shift_prominences = getRamanShiftProminences("dip", sp, baseline, dips, edges, prominences)
 
     if DebugCollector.enabled:
         DebugCollector.log("REGION_DIP_PENALIZATION", "overfitting", [])
         DebugCollector.log("REGION_DIP_PENALIZATION", "underfitting", [])
         DebugCollector.log("REGION_DIP_PENALIZATION", "indexes", [])
-        DebugCollector.log("REGION_DIP_PENALIZATION", "frequencies_prominence", fake_prominences)
+        DebugCollector.log("REGION_DIP_PENALIZATION", "raman_shift_prominences", raman_shift_prominences)
 
-    for dip, prom, (left_edge, right_edge), fp_band in zip(dips, prominences, edges, fake_prominences):
+    for dip, prom, (left_edge, right_edge), fp_band in zip(dips, prominences, edges, raman_shift_prominences):
         freq_prom_baseline_distance_lower = []
         freq_prom_baseline_distance_greater = []
         indexes = []
@@ -206,9 +206,9 @@ def getRegionDipPenalty(sp: np.array, baseline: np.array, dips: list, edges: lis
             DebugCollector.get("REGION_DIP_PENALIZATION","indexes").append(indexes)
 
 
-    regionPenalization = np.sum(lower_penalties) + np.sum(greater_penalties)
+    dipRegionPenalization = np.sum(lower_penalties) + np.sum(greater_penalties)
 
     if DebugCollector.enabled:
-        DebugCollector.log("REGION_DIP_PENALIZATION", "dip_region_penalization", regionPenalization)
+        DebugCollector.log("REGION_DIP_PENALIZATION", "dip_region_penalization", dipRegionPenalization)
 
-    return regionPenalization
+    return dipRegionPenalization

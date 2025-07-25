@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from IS_Score.utils import normalizeSpectraBaseline, normalizeProminence, printOutputTable, _checkInput, DebugCollector
-from IS_Score.band_edges_detection.band_detection import findBands, getBandEdges, validateBands, getWlenProminences
+from IS_Score.band_edges_detection.band_detection import findBands, getBandEdges, _validateBands, getWlenProminences
 from IS_Score.bands_penalization.single_band import getSinglePeakPenalty, getSingleDipPenalty
 from IS_Score.bands_penalization.band_region import getRegionPeakPenalty, getRegionDipPenalty
 from IS_Score.other_penalization.intensity_penalization import getIntensityPenalization
@@ -54,7 +54,7 @@ def getIS_Score(raw_sp: np.array, baseline_corrected_sp: np.array, sp_axis: np.a
     peak_edges = getBandEdges(raw_sp_norm, peaks)
 
     # Sanity Check for bands and edges
-    peaks, peak_edges = validateBands(peaks, peak_edges)
+    peaks, peak_edges = _validateBands(peaks, peak_edges)
     peaks_prominences = getWlenProminences(raw_sp_norm, peaks, peak_edges)
 
     # Normalize the prominences for good comparison with the baseline
@@ -69,7 +69,7 @@ def getIS_Score(raw_sp: np.array, baseline_corrected_sp: np.array, sp_axis: np.a
     else:
         dips = findBands(neg_sp, tolerance=PEAKS_DIPS_TOL["dips"])
     dips_edges = getBandEdges(neg_sp, dips)
-    dips, dips_edges = validateBands(dips, dips_edges)
+    dips, dips_edges = _validateBands(dips, dips_edges)
 
     dips_prominences = getWlenProminences(neg_sp, dips, dips_edges)
     dips_prominences = normalizeProminence(dips_prominences, combined_max, combined_min)
@@ -179,7 +179,7 @@ def getIS_Score(raw_sp: np.array, baseline_corrected_sp: np.array, sp_axis: np.a
         ax.plot(sp_axis, raw_sp_norm_bas, color='tab:blue', alpha=0.4)
         ax.plot(sp_axis, baseline_sp_norm, color='tab:orange')
         ax.scatter(sp_axis[peaks], raw_sp_norm_bas[peaks], color='green', s=100, marker='x')
-        fake_prominences = DebugCollector.collected_data["REGION_PEAK_PENALIZATION"]["frequencies_prominence"]
+        fake_prominences = DebugCollector.collected_data["REGION_PEAK_PENALIZATION"]["raman_shift_prominences"]
 
         for (s, e), fp_band in zip(peak_edges, fake_prominences):
             ax.plot(sp_axis[s:e], raw_sp_norm_bas[s:e], color='m')
@@ -219,7 +219,7 @@ def getIS_Score(raw_sp: np.array, baseline_corrected_sp: np.array, sp_axis: np.a
         ax.plot(sp_axis, raw_sp_norm_bas, color='tab:blue', alpha=0.4)
         ax.plot(sp_axis, baseline_sp_norm, color='tab:orange')
         ax.scatter(sp_axis[dips], raw_sp_norm_bas[dips], color='blue', s=100, marker='x')
-        fake_prominences = DebugCollector.collected_data["REGION_DIP_PENALIZATION"]["frequencies_prominence"]
+        fake_prominences = DebugCollector.collected_data["REGION_DIP_PENALIZATION"]["raman_shift_prominences"]
 
         for (s, e), fp_band in zip(dips_edges, fake_prominences):
             ax.plot(sp_axis[s:e], raw_sp_norm_bas[s:e], color='m')
@@ -255,16 +255,17 @@ def getIS_Score(raw_sp: np.array, baseline_corrected_sp: np.array, sp_axis: np.a
         plt.close(fig)
 
 
-    # data = [
-    #     ["Intensity", round(intensity_penalty,2)],
-    #     ["Single Peak", round(peaks_penalization,2)],
-    #     ["Peak Region", round(peak_region_penalization, 2)],
-    #     ["Single Dip", round(dips_penalization, 2)],
-    #     ["Dip Region", round(dips_region_penalization, 2)],
-    #     ["AUC", round(auc_penalization, 2)],
-    #     ["Mean Ratio", round(mean_ratio_penalization,2)],
-    #     ["IS-Score", round(is_score,2)],
-    # ]
-    #
-    # printOutputTable(data)
+    data = [
+        ["Intensity Penalty", round(intensity_penalty,4)],
+        ["Single Peak Penalty", round(peaks_penalization,4)],
+        ["Peak Region Penalty", round(peak_region_penalization, 4)],
+        ["Single Dip Penalty", round(dips_penalization, 4)],
+        ["Dip Region Penalty", round(dips_region_penalization, 4)],
+        ["AUC Penalty", round(auc_penalization, 4)],
+        ["Mean Ratio Penalty", round(mean_ratio_penalization,4)],
+        ["IS-Score", round(is_score,4)],
+    ]
+
+    printOutputTable(data)
+
     return is_score
