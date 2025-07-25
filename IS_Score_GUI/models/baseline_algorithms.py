@@ -39,6 +39,7 @@ class BaselineAlgorithm:
         self.algorithm.kwargs.update(params)
         return self.algorithm.apply
 
+
 class BubbleFillAlgorithm(BaselineAlgorithm):
     def __init__(self, name, algorithm, params=None):
         super().__init__(name, algorithm, params)
