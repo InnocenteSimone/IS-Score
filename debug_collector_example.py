@@ -30,6 +30,3 @@ plt.figure(fig)
 plt.show()
 
 print(is_score)
-
-
-pass
