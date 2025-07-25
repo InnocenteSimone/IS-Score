@@ -6,7 +6,7 @@ from IS_Score.utils import DebugCollector
 
 def linearInterpOverRegion(sp: np.array, peak_edges: list):
     """
-    Interpolate the spectrum over the regions defined by the peak edges.
+    Linear interpolate the spectrum over the regions defined by the peak edges.
 
     Parameters
     ----------
@@ -54,6 +54,7 @@ def _applyGaussianOffset(x, center, width, amplitude):
 def getInterpolation(sp: np.array, peaks: list, peak_edges: list):
     """
     Get the interpolation of the spectrum using cubic splines and Gaussian offsets.
+
     This interpolation return a fake baseline that is mimic an overfitting behavior.
 
     Parameters

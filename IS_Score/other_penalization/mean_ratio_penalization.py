@@ -15,10 +15,11 @@ def getMeanDipsRatioPenalization(sp: np.array, baseline: np.array):
 
     Returns
     -------
-    float
+    mean_ratio_penalty: float
         The Mean Ratio Dips penalty.
     """
     diffGreaterDips, ratioList = [], []
+    mean_ratio_penalty = 0
 
     for wl in [8, 16, 32, 40]:
         sp_den = signal.savgol_filter(sp, window_length=wl, polyorder=4)
@@ -47,6 +48,5 @@ def getMeanDipsRatioPenalization(sp: np.array, baseline: np.array):
     if np.mean(ratioList) < 5:
         if DebugCollector.enabled:
             DebugCollector.log("MEAN_RATIO_PENALIZATION", "mean_ratio_penalty", np.sum(diffGreaterDips))
-
-        return np.sum(diffGreaterDips)
-    return 0
+        mean_ratio_penalty = np.sum(diffGreaterDips)
+    return mean_ratio_penalty

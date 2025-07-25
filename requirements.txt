@@ -1,0 +1,11 @@
+numpy~=1.26.4
+matplotlib~=3.8.3
+scipy~=1.12.0
+findpeaks~=2.6.6
+setuptools~=65.5.0
+qtmodern~=0.2.0
+PyQt5~=5.15.11
+ramanspy~=0.2.7
+seaborn~=0.13.2
+pandas~=2.2.1
+orplib

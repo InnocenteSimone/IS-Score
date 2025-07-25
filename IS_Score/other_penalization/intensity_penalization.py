@@ -56,8 +56,8 @@ def addNoiseToSignal(sp, scale, peak_edges, dip_edges):
     sp_new = copy(sp)
 
     for (s, e), (s_d, e_d) in zip(peak_edges, dip_edges):
-        sp_new[s:e + 1] = sp_new[s:e + 1] + np.random.normal(loc=0, scale=scale, size=e - s + 1)
-        sp_new[s_d:e_d + 1] = sp_new[s_d:e_d + 1] + np.random.normal(loc=0, scale=scale, size=e_d - s_d + 1)
+        sp_new[s:e + 1] = sp_new[s:e + 1] + np.random.RandomState(42).normal(loc=0, scale=scale, size=e - s + 1)
+        sp_new[s_d:e_d + 1] = sp_new[s_d:e_d + 1] + np.random.RandomState(42).normal(loc=0, scale=scale, size=e_d - s_d + 1)
     return sp_new
 
 def getIntensityPenalization(sp: np.array, baseline: np.array, peaks_edges: list, dips_edges: list):

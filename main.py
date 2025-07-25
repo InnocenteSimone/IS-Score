@@ -3,10 +3,11 @@ from IS_Score.IS_Score import getIS_Score
 
 if __name__ == "__main__":
 
-    spectral_axis = np.arange(1000, 2000, 1)
-    spectral_data = np.random.rand(1000)
-    spectral_data_corrected = spectral_data - np.random.rand(1000) * 0.1
+    sp = np.loadtxt("bin/example/spectrum.txt")
+    sp_corr = np.loadtxt("bin/example/spectrum_corrected.txt")
 
+    is_score_val = getIS_Score(raw_sp=sp[:, 1], baseline_corrected_sp=sp_corr[:, 1],
+                               sp_axis=sp[:, 0])
 
-    # Subtract baseline
-    getIS_Score(raw_sp=spectral_data, baseline_corrected_sp=spectral_data_corrected, sp_axis=spectral_axis)
+    print(is_score_val)
+
