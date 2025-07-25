@@ -254,7 +254,6 @@ def getIS_Score(raw_sp: np.array, baseline_corrected_sp: np.array, sp_axis: np.a
         DebugCollector.logPlot("REGION_DIP_PENALIZATION", "plot", fig)
         plt.close(fig)
 
-
     data = [
         ["Intensity Penalty", round(intensity_penalty,4)],
         ["Single Peak Penalty", round(peaks_penalization,4)],
