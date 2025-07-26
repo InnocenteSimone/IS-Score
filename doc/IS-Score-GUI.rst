@@ -81,7 +81,8 @@ Features
   By clicking the "Compute IS-Score on folder" button, the GUI will process all the spectra in the selected folder and compute the IS-Score for each one and show a boxplot at the end of the process.
 
   Additional, on the left-bottom corner is visible the table with all the outliers from the computation. By double click in a specific row, the user can visualize the spectrum with the baseline correction applied and the IS-Score computed in the previous tab.
-  .. image:: ./images/folder_is_score.png
+
+  .. image:: ./images/is_score_on_folder.png
 
   By switching to the Folder IS-Score Analysis tab, the user can visualize the average spectra with each baseline tested.
 

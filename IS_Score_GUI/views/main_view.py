@@ -159,7 +159,7 @@ class IS_Score_GUI(QMainWindow):
         self.treeFolderView = QTreeView()
         self.treeFolderView.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
 
-        self.computeISScoreOnFolderBtn = QPushButton("Compute Baseline Metric on Folder")
+        self.computeISScoreOnFolderBtn = QPushButton("Compute IS-Score on Folder")
         self.computeISScoreOnFolderBtn.setFixedHeight(25)
         self.computeISScoreOnFolderBtn.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
 
