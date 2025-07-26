@@ -7,4 +7,4 @@ It is intended for **comparative evaluation** across different baseline correcti
 
 Full documentation is available at:
 
-👉 [IS-Score Documentation](https://innocentesimone.github.io/IS-Score/)
+👉 [IS-Score Documentation](https://innocentesimone.github.io/IS_Score/)
