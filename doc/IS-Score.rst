@@ -10,7 +10,7 @@ Installation
 ------------
 .. code-block:: python
 
-    pip install modulename
+    pip install IS-Score
 
 Usage
 -----
@@ -18,7 +18,7 @@ Usage
 
 .. code-block:: python
 
-    from IS_Score.IS_Score import getIS_Score
+    from IS_Score import getIS_Score
 
 2. **Prepare your data:** Ensure you have your Raman spectrum, the corresponding baseline corrected spectrum and the spectral axis ready. These should be in form of arrays or lists.
 .. code-block:: python
