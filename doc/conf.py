@@ -38,9 +38,15 @@ exclude_patterns = []
 add_module_names = False
 
 html_title = 'IS-Score'
+
+# html_sidebars = {
+#   "**": []
+# }
+
 html_sidebars = {
-  "**": []
+    "**": ["sidebar-nav-bs"]
 }
+
 html_context = {
     "default_mode": "light"
 }
@@ -49,14 +55,14 @@ html_theme_options = {
     "navbar_end": ["navbar-icon-links","theme-switcher"],
     "icon_links_label": "Quick Links",
     "icon_links": [
-        # {
-        #     "name": "Slack",
-        #     "url": "https://deepchecks.com/slack",
-        #     "icon": "fab fa-github",
-        # },
+        {
+            "name": "GitHub",
+            "url": "https://github.com/InnocenteSimone/IS_Score/",
+            "icon": "fab fa-github",
+        },
         {
             "name": "PyPI",
-            "url": "https://pypi.org/project/deepchecks/",
+            "url": "https://pypi.org/project/IS-Score/",
             "icon": "fab fa-python",
         }
     ],
